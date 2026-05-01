@@ -35,6 +35,7 @@ Compare two JSON objects and identify structural differences.
 All features are available via REST endpoints for external integration.
 
 ---
+![workflow badge](https://github.com/jkorzekwa55/json-tools-put/actions/workflows/ci.yml/badge.svg)
 
 ## Running the application
 
