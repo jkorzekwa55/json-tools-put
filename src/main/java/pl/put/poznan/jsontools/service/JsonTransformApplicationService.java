@@ -8,6 +8,7 @@ import pl.put.poznan.jsontools.dto.TransformRequest;
 import pl.put.poznan.jsontools.exception.InvalidJsonException;
 import pl.put.poznan.jsontools.service.decorator.ExcludeDecorator;
 import pl.put.poznan.jsontools.service.decorator.MinifyDecorator;
+import pl.put.poznan.jsontools.service.decorator.PrettyPrintDecorator;
 
 import java.util.Collections;
 import java.util.List;
@@ -41,6 +42,13 @@ public class JsonTransformApplicationService {
         JsonNode input = parseJson(jsonText);
         JsonService pipeline = new ExcludeDecorator(baseJsonService, keys);
         return pipeline.process(input);
+    }
+
+    public String prettyPrint(String jsonText) {
+        requireJsonText(jsonText);
+        JsonNode input = parseJson(jsonText);
+        PrettyPrintDecorator pipeline = new PrettyPrintDecorator(baseJsonService);
+        return pipeline.processToString(input);
     }
 
     /**

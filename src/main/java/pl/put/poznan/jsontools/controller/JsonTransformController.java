@@ -53,6 +53,12 @@ public class JsonTransformController {
         return transformApplicationService.transform(request);
     }
 
+    @PostMapping(path = "/pretty-print", consumes = MediaType.APPLICATION_JSON_VALUE)
+    public String prettyPrint(@RequestBody MinifyRequest request) {
+        requireRequestBody(request);
+        return transformApplicationService.prettyPrint(request.getJson());
+    }
+
     private static void requireRequestBody(Object request) {
         if (request == null) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Request body is required");
