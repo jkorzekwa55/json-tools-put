@@ -53,6 +53,9 @@ public class JsonTransformController {
         return transformApplicationService.transform(request);
     }
 
+    /**
+     * Convenience endpoint for pretty-printing JSON into a readable format.
+     */
     @PostMapping(path = "/pretty-print", consumes = MediaType.APPLICATION_JSON_VALUE)
     public String prettyPrint(@RequestBody MinifyRequest request) {
         requireRequestBody(request);
