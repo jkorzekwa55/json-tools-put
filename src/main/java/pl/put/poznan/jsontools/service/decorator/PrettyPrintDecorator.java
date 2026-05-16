@@ -7,8 +7,12 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import pl.put.poznan.jsontools.exception.InvalidJsonException;
 import pl.put.poznan.jsontools.service.JsonService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class PrettyPrintDecorator extends JsonDecorator {
+
+    private static final Logger logger = LoggerFactory.getLogger(PrettyPrintDecorator.class);
 
     private final ObjectMapper objectMapper = new ObjectMapper();
 
@@ -22,6 +26,8 @@ public class PrettyPrintDecorator extends JsonDecorator {
     }
 
     public String processToString(JsonNode input) {
+        logger.debug("Creating pretty-print version of the Json");
+
         JsonNode processedNode = super.process(input);
 
         try {

@@ -3,8 +3,12 @@ package pl.put.poznan.jsontools.service.decorator;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import pl.put.poznan.jsontools.service.JsonService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class MinifyDecorator extends JsonDecorator {
+
+    private static final Logger logger = LoggerFactory.getLogger(MinifyDecorator.class);
 
     private final ObjectMapper objectMapper = new ObjectMapper();
 
@@ -14,6 +18,8 @@ public class MinifyDecorator extends JsonDecorator {
 
     @Override
     public JsonNode process(JsonNode input) {
+
+        logger.debug("Applying Minification");
 
         JsonNode processedNode = super.process(input);
 

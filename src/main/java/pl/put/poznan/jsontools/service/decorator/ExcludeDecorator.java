@@ -4,10 +4,14 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import pl.put.poznan.jsontools.service.JsonService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.List;
 
 public class ExcludeDecorator extends JsonDecorator {
+
+    private static final Logger logger = LoggerFactory.getLogger(ExcludeDecorator.class);
 
     private final List<String> keysToExclude;
 
@@ -18,6 +22,8 @@ public class ExcludeDecorator extends JsonDecorator {
 
     @Override
     public JsonNode process(JsonNode input) {
+        logger.debug("Excluding with {} keys", keysToExclude.size());
+
         JsonNode processedNode = super.process(input);
 
         if (processedNode == null || processedNode.isNull()) {
