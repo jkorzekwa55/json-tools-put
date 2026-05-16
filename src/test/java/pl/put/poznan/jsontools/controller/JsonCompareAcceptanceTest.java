@@ -69,4 +69,24 @@ class JsonCompareAcceptanceTest {
                 .andExpect(jsonPath("$.differences[0].left").value("line 3"))
                 .andExpect(jsonPath("$.differences[0].right").value(""));
     }
+
+    @Test
+    void shouldReturnErrorPayloadWhenCompareRequestIsInvalid() throws Exception {
+        CompareRequest request = new CompareRequest();
+        request.setLeft("line 1");
+
+        mockMvc.perform(post("/api/json/compare")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.error").value("right is required"));
+    }
+
+    @Test
+    void shouldReturnErrorPayloadWhenRequestBodyIsMissing() throws Exception {
+        mockMvc.perform(post("/api/json/compare")
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.error").value("Request body is required"));
+    }
 }

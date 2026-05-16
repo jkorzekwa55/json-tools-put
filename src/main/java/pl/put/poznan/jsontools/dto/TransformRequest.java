@@ -2,6 +2,9 @@ package pl.put.poznan.jsontools.dto;
 
 import java.util.List;
 
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotEmpty;
+
 /**
  * Unified transform body: {@code { "json": "...", "actions": ["minify", "exclude-keys"], "keysToExclude": ["x"] }}
  * <p>
@@ -9,7 +12,10 @@ import java.util.List;
  */
 public class TransformRequest {
 
+    @NotBlank(message = "json is required")
     private String json;
+
+    @NotEmpty(message = "actions is required")
     private List<String> actions;
     private List<String> keysToExclude;
 
