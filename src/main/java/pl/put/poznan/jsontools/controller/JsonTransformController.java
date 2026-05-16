@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import pl.put.poznan.jsontools.dto.ExcludeKeysRequest;
+import pl.put.poznan.jsontools.dto.FilterKeysRequest;
 import pl.put.poznan.jsontools.dto.MinifyRequest;
 import pl.put.poznan.jsontools.dto.TransformRequest;
 import pl.put.poznan.jsontools.service.JsonTransformApplicationService;
@@ -28,7 +29,7 @@ public class JsonTransformController {
      * Convenience endpoint for a single operation (same behavior as {@code actions: ["minify"]} on {@link #transform}).
      */
     @PostMapping(path = "/minify", consumes = MediaType.APPLICATION_JSON_VALUE)
-    public JsonNode minify(@Valid @RequestBody MinifyRequest request) {
+    public String minify(@Valid @RequestBody MinifyRequest request) {
         return transformApplicationService.minify(request.getJson());
     }
 
@@ -41,10 +42,18 @@ public class JsonTransformController {
     }
 
     /**
-     * Endpoint that run any implemented transformation sequence
+     * Convenience endpoint for keep-keys filtering (same as including {@code filter} in {@link #transform}).
+     */
+    @PostMapping(path = "/filter-keys", consumes = MediaType.APPLICATION_JSON_VALUE)
+    public JsonNode filterKeys(@Valid @RequestBody FilterKeysRequest request) {
+        return transformApplicationService.filterKeys(request.getJson(), request.getKeysToKeep());
+    }
+
+    /**
+     * Endpoint that runs any implemented transformation sequence and returns the final JSON text.
      */
     @PostMapping(path = "/transform", consumes = MediaType.APPLICATION_JSON_VALUE)
-    public JsonNode transform(@Valid @RequestBody TransformRequest request) {
+    public String transform(@Valid @RequestBody TransformRequest request) {
         return transformApplicationService.transform(request);
     }
 

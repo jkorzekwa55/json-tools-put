@@ -9,9 +9,10 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotEmpty;
 
 /**
- * Unified transform body: {@code { "json": "...", "actions": ["minify", "exclude-keys"], "keysToExclude": ["x"] }}
+ * Unified transform body: {@code { "json": "...", "actions": ["minify", "exclude-keys", "filter", "pretty-print"], "keysToExclude": ["x"], "keysToKeep": ["a"] }}
  * <p>
- * {@code keysToExclude} is used when an {@code exclude-keys} action appears (same list for each such step).
+ * {@code keysToExclude} is used when an {@code exclude-keys} action appears.
+ * {@code keysToKeep} is used when a {@code filter} action appears.
  */
 @Data
 @NoArgsConstructor
@@ -23,4 +24,5 @@ public class TransformRequest {
     @NotEmpty(message = "actions is required")
     private List<String> actions;
     private List<String> keysToExclude;
+    private List<String> keysToKeep;
 }
