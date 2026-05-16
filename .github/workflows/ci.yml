@@ -13,3 +13,8 @@ jobs:
           cache: maven
       - name: Validate, build and run tests
         run: mvn --batch-mode --update-snapshots verify
+      - name: Upload JAR Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: compiled-application-jar
+          path: target/*.jar
