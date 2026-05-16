@@ -1,8 +1,10 @@
 package pl.put.poznan.jsontools.controller;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import org.springframework.http.MediaType;
 import javax.validation.Valid;
+
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -17,13 +19,10 @@ import pl.put.poznan.jsontools.service.JsonTransformApplicationService;
  */
 @RestController
 @RequestMapping(path = "/api/json", produces = MediaType.APPLICATION_JSON_VALUE)
+@RequiredArgsConstructor
 public class JsonTransformController {
 
     private final JsonTransformApplicationService transformApplicationService;
-
-    public JsonTransformController(JsonTransformApplicationService transformApplicationService) {
-        this.transformApplicationService = transformApplicationService;
-    }
 
     /**
      * Convenience endpoint for a single operation (same behavior as {@code actions: ["minify"]} on {@link #transform}).

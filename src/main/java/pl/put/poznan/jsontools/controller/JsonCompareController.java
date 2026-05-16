@@ -1,7 +1,9 @@
 package pl.put.poznan.jsontools.controller;
 
-import org.springframework.http.MediaType;
 import javax.validation.Valid;
+
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -15,13 +17,10 @@ import java.util.List;
 
 @RestController
 @RequestMapping(path = "/api/json", produces = MediaType.APPLICATION_JSON_VALUE)
+@RequiredArgsConstructor
 public class JsonCompareController {
 
     private final CompareService compareService;
-
-    public JsonCompareController(CompareService compareService) {
-        this.compareService = compareService;
-    }
 
     @PostMapping(path = "/compare")
     public CompareResponse compare(@Valid @RequestBody CompareRequest request) {
