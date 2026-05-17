@@ -6,43 +6,29 @@ import com.fasterxml.jackson.core.util.DefaultPrettyPrinter;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import pl.put.poznan.jsontools.exception.InvalidJsonException;
-import pl.put.poznan.jsontools.service.JsonService;
 import lombok.extern.slf4j.Slf4j;
 import pl.put.poznan.jsontools.exception.InvalidJsonException;
 import pl.put.poznan.jsontools.service.JsonService;
+
 /**
- * A decorator that formats a JSON tree into a human-readable string.
- * 
- * Unlike other decorators that structurally modify the {@link JsonNode}, 
- * this decorator focuses on serialization. It uses Jackson's {@link DefaultPrettyPrinter}
- * configured with a 2-space indentation and newline characters to output 
- * a cleanly formatted, highly readable JSON string.
- *
- * @see JsonDecorator
+ * Decorator that formats a JSON into a human-readable format.
  */
 @Slf4j
 public class PrettyPrintDecorator extends JsonDecorator {
     private final ObjectMapper objectMapper = new ObjectMapper();
 
     /**
-     * Constructs a new PrettyPrintDecorator.
-     *
-     * @param wrappedService the base JSON service or another decorator to wrap
+     * Modifies JSON tree, by formating it in human-readable way
      */
     public PrettyPrintDecorator(JsonService wrappedService) {
         super(wrappedService);
     }
 
     /**
-     * Processes the input JSON by passing it to the wrapped service.
-     * 
-     * Note: This method returns the raw {@link JsonNode} without formatting, 
-     * as pretty-printing is a string serialization process. To get the 
-     * formatted string, use {@link #processToString(JsonNode)}.
+     * Processes JSON and formats it to be human-readable
      *
-     * @param input the initial {@link JsonNode} to be processed
-     * @return the structurally processed {@link JsonNode}
+     * @param input JSON node input
+     * @return processed JSON that is human-readable
      */
     @Override
     public JsonNode process(JsonNode input) {
@@ -50,15 +36,11 @@ public class PrettyPrintDecorator extends JsonDecorator {
     }
 
     /**
-     * Processes the input JSON through the wrapped service and then serializes 
-     * the result into a beautifully formatted string.
-     * 
-     * Objects and arrays are indented using two spaces per level.
+     * Processes JSON and formats it in human-readable way
      *
-     * @param input the initial {@link JsonNode} to be processed
-     * @return a formatted, human-readable JSON string
-     * @throws InvalidJsonException if an error occurs during the Jackson 
-     * string serialization process
+     * @param input JSON node input
+     * @return processed JSON with human-readable format
+     * @throws InvalidJsonException when given JSON is invalid 
      */
     public String processToString(JsonNode input) {
         log.debug("Using PrettyPrintDecorator");

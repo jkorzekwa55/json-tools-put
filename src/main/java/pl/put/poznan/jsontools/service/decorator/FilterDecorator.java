@@ -11,37 +11,26 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import lombok.extern.slf4j.Slf4j;
 import pl.put.poznan.jsontools.service.JsonService;
 
-/**
- * A decorator that filters a JSON tree, retaining only the keys specified in an allowed list.
- * 
- * This class traverses the JSON structure recursively. If a key is present in the 
- * {@code keysToKeep} list, it is retained along with its children. If a key is not 
- * in the list, it is entirely removed from the resulting JSON.
- * * @see JsonDecorator
- */
+/** 
+ * Decorator that recursively filters out JSON tree and keeps specified keys only. 
+ * */
 @Slf4j
 public class FilterDecorator extends JsonDecorator {
 
     private final Set<String> keysToKeep;
-
     /**
-     * Constructs a new FilterDecorator.
-     *
-     * @param wrappedService the base JSON service or another decorator to wrap
-     * @param keysToKeep a list of string keys that should be retained in the JSON
-     */
+    * Modifies a JSON tree, by keeping only specified keys recusively.
+    */
     public FilterDecorator(JsonService wrappedService, List<String> keysToKeep) {
         super(wrappedService);
         this.keysToKeep = Set.copyOf(keysToKeep);
     }
 
-    /**
-     * Processes the input JSON by first passing it to the wrapped service, 
-     * and then recursively filtering out any keys not present in the keep list.
-     *
-     * @param input the initial JSON node to be processed
-     * @return a new {@link JsonNode} containing only the allowed keys, 
-     * or an empty JSON object if no keys matched. Returns null if the input is null.
+    /** 
+     * Processes JSON and keeps only specified keys recursively.
+     * 
+     * @param input : JSON node input
+     * @return processed JSON with only specified keys
      */
     @Override
     public JsonNode process(JsonNode input) {
@@ -54,21 +43,18 @@ public class FilterDecorator extends JsonDecorator {
         return filterKeysRecursively(processedNode, keysToKeep);
     }
     /**
-     * Recursively traverses and filters a JSON node, retaining only the allowed keys.
+     * Recursively traverses a JSON and keeps specified keys only
      * 
-     * For JSON objects, it iterates through all fields, removing any key not present 
-     * in the allowed list, and recursively filters the remaining child nodes.
-     * For JSON arrays, it iterates through and recursively filters every element.
-     * Primitive value nodes (strings, numbers, booleans) are returned unmodified.
-     *
-     * @param node the current {@link JsonNode} being inspected and filtered
-     * @param keys the collection of allowed keys that should be retained
-     * @return a processed {@link JsonNode} with unlisted keys removed
+     * @param node inout JSON node
+     * @param keys keys to be kept in JSON
+     * @return processed JSON with specified keys only   
      */
     private JsonNode filterKeysRecursively(JsonNode node, Set<String> keys) {
         if (node.isObject()) {
-            ObjectNode objectNode = node.deepCopy();
+            // keys are iterated to remove from JSON and its elements proccessed recursively
 
+            ObjectNode objectNode = node.deepCopy();
+            
             Iterator<String> fieldNames = node.fieldNames();
             while (fieldNames.hasNext()) {
                 String fieldName = fieldNames.next();
@@ -83,6 +69,8 @@ public class FilterDecorator extends JsonDecorator {
             return objectNode;
 
         } else if (node.isArray()) {
+            // elements of JSON arrays are iterated and processed recursively
+
             ArrayNode arrayNode = node.deepCopy();
             for (int i = 0; i < arrayNode.size(); i++) {
                 JsonNode arrayElement = arrayNode.get(i);
