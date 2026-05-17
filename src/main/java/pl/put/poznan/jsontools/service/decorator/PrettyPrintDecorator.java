@@ -5,15 +5,12 @@ import com.fasterxml.jackson.core.util.DefaultIndenter;
 import com.fasterxml.jackson.core.util.DefaultPrettyPrinter;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.extern.slf4j.Slf4j;
 import pl.put.poznan.jsontools.exception.InvalidJsonException;
 import pl.put.poznan.jsontools.service.JsonService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
+@Slf4j
 public class PrettyPrintDecorator extends JsonDecorator {
-
-    private static final Logger logger = LoggerFactory.getLogger(PrettyPrintDecorator.class);
-
     private final ObjectMapper objectMapper = new ObjectMapper();
 
     public PrettyPrintDecorator(JsonService wrappedService) {
@@ -26,7 +23,7 @@ public class PrettyPrintDecorator extends JsonDecorator {
     }
 
     public String processToString(JsonNode input) {
-        logger.debug("Using PrettyPrintDecorator");
+        log.debug("Using PrettyPrintDecorator");
 
         JsonNode processedNode = super.process(input);
 
@@ -38,7 +35,7 @@ public class PrettyPrintDecorator extends JsonDecorator {
             return objectMapper.writer(prettyPrinter).writeValueAsString(processedNode);
 
         } catch (JsonProcessingException e) {
-            logger.debug("Failed to apply PrettyPrintDecorator", e);
+            log.debug("Failed to apply PrettyPrintDecorator", e);
             throw new InvalidJsonException("Invalid JSON", e);
         }
     }

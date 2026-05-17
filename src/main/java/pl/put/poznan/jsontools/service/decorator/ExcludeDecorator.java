@@ -3,16 +3,13 @@ package pl.put.poznan.jsontools.service.decorator;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import lombok.extern.slf4j.Slf4j;
 import pl.put.poznan.jsontools.service.JsonService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.List;
 
+@Slf4j
 public class ExcludeDecorator extends JsonDecorator {
-
-    private static final Logger logger = LoggerFactory.getLogger(ExcludeDecorator.class);
-
     private final List<String> keysToExclude;
 
     public ExcludeDecorator(JsonService wrappedService, List<String> keysToExclude) {
@@ -22,12 +19,12 @@ public class ExcludeDecorator extends JsonDecorator {
 
     @Override
     public JsonNode process(JsonNode input) {
-        logger.debug("Using ExcludeDecorator with {} keys", keysToExclude.size());
+        log.debug("Using ExcludeDecorator with {} keys", keysToExclude.size());
 
         JsonNode processedNode = super.process(input);
 
         if (processedNode == null || processedNode.isNull()) {
-            logger.debug("Skipping ExcludeDecorator - processed JSON node is null");
+            log.debug("Skipping ExcludeDecorator - processed JSON node is null");
             return processedNode;
         }
 
