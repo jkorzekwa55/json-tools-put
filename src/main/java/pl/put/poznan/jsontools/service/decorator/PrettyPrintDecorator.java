@@ -8,7 +8,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import pl.put.poznan.jsontools.exception.InvalidJsonException;
 import pl.put.poznan.jsontools.service.JsonService;
-
+import lombok.extern.slf4j.Slf4j;
+import pl.put.poznan.jsontools.exception.InvalidJsonException;
+import pl.put.poznan.jsontools.service.JsonService;
 /**
  * A decorator that formats a JSON tree into a human-readable string.
  * 
@@ -19,8 +21,8 @@ import pl.put.poznan.jsontools.service.JsonService;
  *
  * @see JsonDecorator
  */
+@Slf4j
 public class PrettyPrintDecorator extends JsonDecorator {
-
     private final ObjectMapper objectMapper = new ObjectMapper();
 
     /**
@@ -59,6 +61,8 @@ public class PrettyPrintDecorator extends JsonDecorator {
      * string serialization process
      */
     public String processToString(JsonNode input) {
+        log.debug("Using PrettyPrintDecorator");
+
         JsonNode processedNode = super.process(input);
 
         try {
@@ -66,11 +70,10 @@ public class PrettyPrintDecorator extends JsonDecorator {
             prettyPrinter.indentObjectsWith(new DefaultIndenter("  ", "\n"));
             prettyPrinter.indentArraysWith(new DefaultIndenter("  ", "\n"));
 
-            return objectMapper
-                    .writer(prettyPrinter)
-                    .writeValueAsString(processedNode);
+            return objectMapper.writer(prettyPrinter).writeValueAsString(processedNode);
 
         } catch (JsonProcessingException e) {
+            log.debug("Failed to apply PrettyPrintDecorator", e);
             throw new InvalidJsonException("Invalid JSON", e);
         }
     }

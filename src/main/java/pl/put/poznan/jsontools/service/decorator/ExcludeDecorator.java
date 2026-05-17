@@ -5,6 +5,8 @@ import java.util.List;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import lombok.extern.slf4j.Slf4j;
+import pl.put.poznan.jsontools.service.JsonService;
 
 import pl.put.poznan.jsontools.service.JsonService;
 
@@ -18,8 +20,8 @@ import pl.put.poznan.jsontools.service.JsonService;
  *
  * @see JsonDecorator
  */
+@Slf4j
 public class ExcludeDecorator extends JsonDecorator {
-
     private final List<String> keysToExclude;
 
     /**
@@ -43,9 +45,12 @@ public class ExcludeDecorator extends JsonDecorator {
      */
     @Override
     public JsonNode process(JsonNode input) {
+        log.debug("Using ExcludeDecorator with {} keys", keysToExclude.size());
+
         JsonNode processedNode = super.process(input);
 
         if (processedNode == null || processedNode.isNull()) {
+            log.debug("Skipping ExcludeDecorator - processed JSON node is null");
             return processedNode;
         }
 
