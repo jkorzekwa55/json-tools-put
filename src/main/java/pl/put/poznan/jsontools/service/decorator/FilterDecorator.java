@@ -8,9 +8,10 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
+import lombok.extern.slf4j.Slf4j;
 import pl.put.poznan.jsontools.service.JsonService;
 
-
+@Slf4j
 public class FilterDecorator extends JsonDecorator {
 
     private final Set<String> keysToKeep;
@@ -22,8 +23,10 @@ public class FilterDecorator extends JsonDecorator {
 
     @Override
     public JsonNode process(JsonNode input) {
+        log.debug("Applying FilterDecorator with {} keys", keysToKeep.size());
         JsonNode processedNode = super.process(input);
         if (processedNode == null || processedNode.isNull()) {
+            log.debug("Skipping FilterDecorator - processed JSON node is null");
             return processedNode;
         }
         return filterKeysRecursively(processedNode, keysToKeep);

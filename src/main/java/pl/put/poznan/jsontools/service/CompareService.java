@@ -1,5 +1,6 @@
 package pl.put.poznan.jsontools.service;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import pl.put.poznan.jsontools.dto.DiffLine;
 
@@ -8,18 +9,21 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
+@Slf4j
 @Service
 public class CompareService {
-
     /**
      * Compares two texts line-by-line and returns a list of differing lines.
      * Lines are 1-based.
      */
     public List<DiffLine> compareLines(String left, String right) {
+        log.info("Starting JSON comparison");
+        log.debug("Comparison input lengths - left={}, right={}", lengthOf(left), lengthOf(right));
         if (left == null) left = "";
         if (right == null) right = "";
 
         if (left.isEmpty() && right.isEmpty()) {
+            log.info("Finished line-by-line comparison with 0 differences");
             return Collections.emptyList();
         }
 
@@ -36,7 +40,10 @@ public class CompareService {
                 diffs.add(new DiffLine(i + 1, l, r));
             }
         }
-
+        log.info("Finished comparison with {} differences", diffs.size());
         return diffs;
+    }
+    private static int lengthOf(String text) {
+        return text != null ? text.length() : 0;
     }
 }
