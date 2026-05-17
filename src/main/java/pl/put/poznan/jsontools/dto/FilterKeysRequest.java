@@ -9,15 +9,15 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotEmpty;
 
 /**
- * Body for excluding keys: {@code { "json": "...", "keysToExclude": ["a", "b"] }}.
+ * Body for filtering keys: {@code { "json": "...", "keysToKeep": ["a", "b"] }}.
  */
 @Data
 @NoArgsConstructor
-public class ExcludeKeysRequest {
+public class FilterKeysRequest {
 
     @NotBlank(message = "json is required")
     private String json;
 
-    @NotEmpty(message = "keysToExclude is required")
-    private List<String> keysToExclude;
+    @NotEmpty(message = "keysToKeep is required")
+    private List<String> keysToKeep;
 }
