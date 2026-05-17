@@ -12,6 +12,8 @@ import pl.put.poznan.jsontools.dto.CompareRequest;
 import pl.put.poznan.jsontools.dto.CompareResponse;
 import pl.put.poznan.jsontools.dto.DiffLine;
 import pl.put.poznan.jsontools.service.CompareService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.List;
 
@@ -20,15 +22,20 @@ import java.util.List;
 @RequiredArgsConstructor
 public class JsonCompareController {
 
+    private static final Logger logger = LoggerFactory.getLogger(JsonCompareController.class);
+
     private final CompareService compareService;
 
     @PostMapping(path = "/compare")
     public CompareResponse compare(@Valid @RequestBody CompareRequest request) {
+        logger.info("Received compare request");
         String left = request.getLeft();
         String right = request.getRight();
+        logger.debug("Compare request left length - {}, right length - {}", left.length(), right.length());
         List<DiffLine> diffs = compareService.compareLines(left, right);
         CompareResponse response = new CompareResponse();
         response.setDifferences(diffs);
+        logger.info("Returning compare response");
         return response;
     }
 }

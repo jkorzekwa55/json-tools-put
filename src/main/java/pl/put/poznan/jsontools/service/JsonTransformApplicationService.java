@@ -15,12 +15,16 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 /**
  * Builds decorator pipelines and runs transformations (parsing + {@link JsonService} chain).
  * Keeps HTTP adapters thin and matches the sprint task of a service layer that invokes transformations.
  */
 @Service
 public class JsonTransformApplicationService {
+    private static final Logger logger = LoggerFactory.getLogger(JsonTransformApplicationService.class);
 
     private final BaseJsonService baseJsonService;
     private final ObjectMapper objectMapper;
@@ -31,37 +35,50 @@ public class JsonTransformApplicationService {
     }
 
     public String minify(String jsonText) {
+        logger.info("Starting minify transformation");
         requireJsonText(jsonText);
         JsonNode input = parseJson(jsonText);
         JsonService pipeline = new MinifyDecorator(baseJsonService);
         JsonNode processedNode = pipeline.process(input);
         try {
-            return objectMapper.writeValueAsString(processedNode);
+            String result = objectMapper.writeValueAsString(processedNode);
+            logger.info("Finished minify transformation");
+            return result;
         } catch (JsonProcessingException e) {
+            logger.debug("Failed to serialize minified JSON", e);
             throw new InvalidJsonException("Invalid JSON", e);
         }
     }
 
     public JsonNode excludeKeys(String jsonText, List<String> keysToExclude) {
+        logger.info("Starting exclude-keys transformation");
+        logger.debug("ExcludeKeys input JSON length - {}, keys count - {}", lengthOf(jsonText), sizeOf(keysToExclude));
         requireJsonText(jsonText);
         List<String> keys = keysToExclude != null ? keysToExclude : Collections.emptyList();
         JsonNode input = parseJson(jsonText);
         JsonService pipeline = new ExcludeDecorator(baseJsonService, keys);
+        logger.info("Finished exclude-keys transformation");
         return pipeline.process(input);
     }
 
     public JsonNode filterKeys(String jsonText, List<String> keysToKeep) {
+        logger.info("Starting filter-keys transformation");
+        logger.debug("FilterKeys input JSON length - {}, keys count - {}", lengthOf(jsonText), sizeOf(keysToKeep));
         requireJsonText(jsonText);
         List<String> keys = keysToKeep != null ? keysToKeep : Collections.emptyList();
         JsonNode input = parseJson(jsonText);
         JsonService pipeline = new FilterDecorator(baseJsonService, keys);
+        logger.info("Finished filter-keys transformation");
         return pipeline.process(input);
     }
 
     public String prettyPrint(String jsonText) {
+        logger.info("Starting pretty-print transformation");
+        logger.debug("PrettyPrint input JSON length - {}", lengthOf(jsonText));
         requireJsonText(jsonText);
         JsonNode input = parseJson(jsonText);
         PrettyPrintDecorator pipeline = new PrettyPrintDecorator(baseJsonService);
+        logger.info("Finished pretty-print transformation");
         return pipeline.processToString(input);
     }
 
@@ -73,6 +90,8 @@ public class JsonTransformApplicationService {
         if (request == null) {
             throw new IllegalArgumentException("Request body is required");
         }
+        logger.info("Starting Transformation pipeline");
+        logger.debug("Transform input JSON length - {}, actions count - {}", lengthOf(request.getJson()), sizeOf(request.getActions()));
         requireJsonText(request.getJson());
         if (request.getActions() == null || request.getActions().isEmpty()) {
             throw new IllegalArgumentException("Field \"actions\" must not be empty");
@@ -93,6 +112,7 @@ public class JsonTransformApplicationService {
                 throw new IllegalArgumentException("Actions must not be null or blank");
             }
             String action = normalizeAction(rawAction);
+            logger.debug("Adding normalized action to Transformation pipeline - {}", action);
             switch (action) {
                 case "minify":
                     pipeline = new MinifyDecorator(pipeline);
@@ -109,19 +129,25 @@ public class JsonTransformApplicationService {
                     outputFormat = OutputFormat.PRETTY;
                     break;
                 default:
+                    logger.info("Unknown transformation action requested - {}", rawAction);
                     throw new IllegalArgumentException("Unknown action: " + rawAction);
             }
         }
+        logger.debug("Selected transformation output format - {}", outputFormat);
 
         if (outputFormat == OutputFormat.PRETTY) {
             PrettyPrintDecorator prettyPipeline = new PrettyPrintDecorator(pipeline);
+            logger.info("Finished transformation pipeline");
             return prettyPipeline.processToString(input);
         }
 
         JsonNode processedNode = pipeline.process(input);
         try {
-            return objectMapper.writeValueAsString(processedNode);
+            String result = objectMapper.writeValueAsString(processedNode);
+            logger.info("Finished transformation pipeline");
+            return result;
         } catch (JsonProcessingException e) {
+            logger.debug("Failed to serialize transformed JSON", e);
             throw new InvalidJsonException("Invalid JSON", e);
         }
     }
@@ -138,8 +164,10 @@ public class JsonTransformApplicationService {
 
     private JsonNode parseJson(String jsonText) {
         try {
+            logger.debug("Parsing JSON input");
             return objectMapper.readTree(jsonText);
         } catch (JsonProcessingException e) {
+            logger.debug("Failed to parse JSON input", e);
             throw new InvalidJsonException("Invalid JSON", e);
         }
     }
@@ -147,5 +175,12 @@ public class JsonTransformApplicationService {
     private enum OutputFormat {
         COMPACT,
         PRETTY
+    }
+    private static int lengthOf(String text) {
+        return text != null ? text.length() : 0;
+    }
+
+    private static int sizeOf(List<?> list) {
+        return list != null ? list.size() : 0;
     }
 }

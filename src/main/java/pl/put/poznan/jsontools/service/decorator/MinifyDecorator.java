@@ -18,7 +18,6 @@ public class MinifyDecorator extends JsonDecorator {
 
     @Override
     public JsonNode process(JsonNode input) {
-
         logger.debug("Applying Minification");
 
         JsonNode processedNode = super.process(input);
@@ -27,6 +26,7 @@ public class MinifyDecorator extends JsonDecorator {
             String minifiedText = objectMapper.writeValueAsString(processedNode);
             return objectMapper.readTree(minifiedText);
         } catch (Exception e) {
+            logger.debug("Failed to apply MinifyDecorator", e);
             throw new IllegalArgumentException(e.getMessage());
         }
     }

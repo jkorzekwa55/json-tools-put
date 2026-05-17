@@ -8,10 +8,14 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import pl.put.poznan.jsontools.service.JsonService;
 
 
 public class FilterDecorator extends JsonDecorator {
+    private static final Logger logger = LoggerFactory.getLogger(FilterDecorator.class);
 
     private final Set<String> keysToKeep;
 
@@ -22,8 +26,10 @@ public class FilterDecorator extends JsonDecorator {
 
     @Override
     public JsonNode process(JsonNode input) {
+        logger.debug("Applying FilterDecorator with {} keys", keysToKeep.size());
         JsonNode processedNode = super.process(input);
         if (processedNode == null || processedNode.isNull()) {
+            logger.debug("Skipping FilterDecorator - processed JSON node is null");
             return processedNode;
         }
         return filterKeysRecursively(processedNode, keysToKeep);

@@ -14,6 +14,9 @@ import pl.put.poznan.jsontools.dto.FilterKeysRequest;
 import pl.put.poznan.jsontools.dto.MinifyRequest;
 import pl.put.poznan.jsontools.dto.TransformRequest;
 import pl.put.poznan.jsontools.service.JsonTransformApplicationService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import java.util.Collection;
 
 /**
  * {@link pl.put.poznan.jsontools.exception.JsonTransformExceptionHandler} maps domain errors to 400 responses with {@link pl.put.poznan.jsontools.exception.ErrorResponse}.
@@ -22,6 +25,7 @@ import pl.put.poznan.jsontools.service.JsonTransformApplicationService;
 @RequestMapping(path = "/api/json", produces = MediaType.APPLICATION_JSON_VALUE)
 @RequiredArgsConstructor
 public class JsonTransformController {
+    private static final Logger logger = LoggerFactory.getLogger(JsonTransformController.class);
 
     private final JsonTransformApplicationService transformApplicationService;
 
@@ -30,6 +34,8 @@ public class JsonTransformController {
      */
     @PostMapping(path = "/minify", consumes = MediaType.APPLICATION_JSON_VALUE)
     public String minify(@Valid @RequestBody MinifyRequest request) {
+        logger.info("Received minify request");
+        logger.debug("Minify request JSON length - {}",  lengthOf(request.getJson()));
         return transformApplicationService.minify(request.getJson());
     }
 
@@ -38,6 +44,8 @@ public class JsonTransformController {
      */
     @PostMapping(path = "/exclude-keys", consumes = MediaType.APPLICATION_JSON_VALUE)
     public JsonNode excludeKeys(@Valid @RequestBody ExcludeKeysRequest request) {
+        logger.info("Received exclude-keys request");
+        logger.debug("Exclude-keys request JSON length - {}, keys count - {}", request.getJson(), request.getKeysToExclude());
         return transformApplicationService.excludeKeys(request.getJson(), request.getKeysToExclude());
     }
 
@@ -46,6 +54,8 @@ public class JsonTransformController {
      */
     @PostMapping(path = "/filter-keys", consumes = MediaType.APPLICATION_JSON_VALUE)
     public JsonNode filterKeys(@Valid @RequestBody FilterKeysRequest request) {
+        logger.info("Received filter-keys request");
+        logger.debug("Filter-keys request JSON length - {}, keys count - {}", lengthOf(request.getJson()), sizeOf(request.getKeysToKeep()));
         return transformApplicationService.filterKeys(request.getJson(), request.getKeysToKeep());
     }
 
@@ -54,6 +64,9 @@ public class JsonTransformController {
      */
     @PostMapping(path = "/transform", consumes = MediaType.APPLICATION_JSON_VALUE)
     public String transform(@Valid @RequestBody TransformRequest request) {
+        logger.info("Received transform request");
+        logger.debug("Transform request JSON length - {}, actions count - {}, keysToExclude count - {}, keysToKeep count - {}",
+                lengthOf(request.getJson()), sizeOf(request.getActions()), sizeOf(request.getKeysToExclude()), sizeOf(request.getKeysToKeep()));
         return transformApplicationService.transform(request);
     }
 
@@ -62,6 +75,14 @@ public class JsonTransformController {
      */
     @PostMapping(path = "/pretty-print", consumes = MediaType.APPLICATION_JSON_VALUE)
     public String prettyPrint(@Valid @RequestBody MinifyRequest request) {
+        logger.info("Received pretty-print request");
+        logger.debug("Pretty-print request JSON length: {}", lengthOf(request.getJson()));
         return transformApplicationService.prettyPrint(request.getJson());
+    }
+    private static int lengthOf(String text) {
+        return text != null ? text.length() : 0;
+    }
+    private static int sizeOf(Collection<?> collection) {
+        return collection != null ? collection.size() : 0;
     }
 }

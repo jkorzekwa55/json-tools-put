@@ -7,19 +7,24 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @Service
 public class CompareService {
-
+    private static final Logger logger = LoggerFactory.getLogger(CompareService.class);
     /**
      * Compares two texts line-by-line and returns a list of differing lines.
      * Lines are 1-based.
      */
     public List<DiffLine> compareLines(String left, String right) {
+        logger.info("Starting JSON comparison");
+        logger.debug("Comparison input lengths - left={}, right={}", lengthOf(left), lengthOf(right));
         if (left == null) left = "";
         if (right == null) right = "";
 
         if (left.isEmpty() && right.isEmpty()) {
+            logger.info("Finished line-by-line comparison with 0 differences");
             return Collections.emptyList();
         }
 
@@ -36,7 +41,10 @@ public class CompareService {
                 diffs.add(new DiffLine(i + 1, l, r));
             }
         }
-
+        logger.info("Finished comparison with {} differences", diffs.size());
         return diffs;
+    }
+    private static int lengthOf(String text) {
+        return text != null ? text.length() : 0;
     }
 }

@@ -22,11 +22,12 @@ public class ExcludeDecorator extends JsonDecorator {
 
     @Override
     public JsonNode process(JsonNode input) {
-        logger.debug("Excluding with {} keys", keysToExclude.size());
+        logger.debug("Using ExcludeDecorator with {} keys", keysToExclude.size());
 
         JsonNode processedNode = super.process(input);
 
         if (processedNode == null || processedNode.isNull()) {
+            logger.debug("Skipping ExcludeDecorator - processed JSON node is null");
             return processedNode;
         }
 

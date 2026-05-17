@@ -26,7 +26,7 @@ public class PrettyPrintDecorator extends JsonDecorator {
     }
 
     public String processToString(JsonNode input) {
-        logger.debug("Creating pretty-print version of the Json");
+        logger.debug("Using PrettyPrintDecorator");
 
         JsonNode processedNode = super.process(input);
 
@@ -35,11 +35,10 @@ public class PrettyPrintDecorator extends JsonDecorator {
             prettyPrinter.indentObjectsWith(new DefaultIndenter("  ", "\n"));
             prettyPrinter.indentArraysWith(new DefaultIndenter("  ", "\n"));
 
-            return objectMapper
-                    .writer(prettyPrinter)
-                    .writeValueAsString(processedNode);
+            return objectMapper.writer(prettyPrinter).writeValueAsString(processedNode);
 
         } catch (JsonProcessingException e) {
+            logger.debug("Failed to apply PrettyPrintDecorator", e);
             throw new InvalidJsonException("Invalid JSON", e);
         }
     }
