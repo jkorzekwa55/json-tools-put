@@ -2,18 +2,32 @@ package pl.put.poznan.jsontools.service.decorator;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+
 import lombok.extern.slf4j.Slf4j;
 import pl.put.poznan.jsontools.service.JsonService;
 
+/**
+ * Decorator that minifies JSON to compact format.
+ */
 @Slf4j
 public class MinifyDecorator extends JsonDecorator {
 
     private final ObjectMapper objectMapper = new ObjectMapper();
 
+    /**
+     * Modifies JSON tree, by minifying it to compacted format.
+     */
     public MinifyDecorator(JsonService wrappedService) {
         super(wrappedService);
     }
 
+    /**
+     * Processes JSON and compacts it to minified version.
+     * 
+     * @param input JSON node input
+     * @return processed JSON with minified format
+     * @throws IllegalArgumentException 
+     */
     @Override
     public JsonNode process(JsonNode input) {
         log.debug("Applying Minification");
@@ -28,6 +42,4 @@ public class MinifyDecorator extends JsonDecorator {
             throw new IllegalArgumentException(e.getMessage());
         }
     }
-
-
 }

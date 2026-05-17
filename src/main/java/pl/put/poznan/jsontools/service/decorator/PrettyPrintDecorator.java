@@ -5,23 +5,43 @@ import com.fasterxml.jackson.core.util.DefaultIndenter;
 import com.fasterxml.jackson.core.util.DefaultPrettyPrinter;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+
 import lombok.extern.slf4j.Slf4j;
 import pl.put.poznan.jsontools.exception.InvalidJsonException;
 import pl.put.poznan.jsontools.service.JsonService;
 
+/**
+ * Decorator that formats a JSON into a human-readable format.
+ */
 @Slf4j
 public class PrettyPrintDecorator extends JsonDecorator {
     private final ObjectMapper objectMapper = new ObjectMapper();
 
+    /**
+     * Modifies JSON tree, by formating it in human-readable way
+     */
     public PrettyPrintDecorator(JsonService wrappedService) {
         super(wrappedService);
     }
 
+    /**
+     * Processes JSON and formats it to be human-readable
+     *
+     * @param input JSON node input
+     * @return processed JSON that is human-readable
+     */
     @Override
     public JsonNode process(JsonNode input) {
         return super.process(input);
     }
 
+    /**
+     * Processes JSON and formats it in human-readable way
+     *
+     * @param input JSON node input
+     * @return processed JSON with human-readable format
+     * @throws InvalidJsonException when given JSON is invalid 
+     */
     public String processToString(JsonNode input) {
         log.debug("Using PrettyPrintDecorator");
 

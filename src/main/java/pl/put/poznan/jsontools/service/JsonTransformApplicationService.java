@@ -1,8 +1,15 @@
 package pl.put.poznan.jsontools.service;
 
+import java.util.Collections;
+import java.util.List;
+import java.util.Locale;
+
+import org.springframework.stereotype.Service;
+
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import pl.put.poznan.jsontools.dto.TransformRequest;
@@ -82,8 +89,10 @@ public class JsonTransformApplicationService {
     }
 
     /**
-     * Applies {@link TransformRequest#getActions()} in order: first action is innermost (closest to base),
+     * Applies {@link TransformRequest#actions} in order: first action is innermost (closest to base),
      * last is outermost (runs last on the data flowing through the chain).
+     * @param request the request containing the JSON and the list of actions to apply
+     * @return the transformed JSON string as defined by the requested output format
      */
     public String transform(TransformRequest request) {
         if (request == null) {
