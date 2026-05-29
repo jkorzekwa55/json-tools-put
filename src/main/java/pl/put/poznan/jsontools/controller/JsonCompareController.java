@@ -17,6 +17,7 @@ import pl.put.poznan.jsontools.service.CompareService;
 
 import java.util.List;
 
+/** REST API for comparing two JSON (or plain text) documents line by line. */
 @Slf4j
 @RestController
 @RequestMapping(path = "/api/json", produces = MediaType.APPLICATION_JSON_VALUE)

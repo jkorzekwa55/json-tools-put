@@ -11,25 +11,18 @@ import pl.put.poznan.jsontools.exception.InvalidJsonException;
 import pl.put.poznan.jsontools.service.JsonService;
 
 /**
- * Decorator that formats a JSON into a human-readable format.
+ * Decorator that pretty-prints JSON text. Use {@link #processToString} for indented output;
+ * {@link #process} only runs the inner chain.
  */
 @Slf4j
 public class PrettyPrintDecorator extends JsonDecorator {
+
     private final ObjectMapper objectMapper = new ObjectMapper();
 
-    /**
-     * Modifies JSON tree, by formating it in human-readable way
-     */
     public PrettyPrintDecorator(JsonService wrappedService) {
         super(wrappedService);
     }
 
-    /**
-     * Processes JSON and formats it to be human-readable
-     *
-     * @param input JSON node input
-     * @return processed JSON that is human-readable
-     */
     @Override
     public JsonNode process(JsonNode input) {
         return super.process(input);

@@ -9,12 +9,10 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import lombok.extern.slf4j.Slf4j;
 import pl.put.poznan.jsontools.service.JsonService;
 
-
-/**
- * Decorator that recursively removes selected keys from JSON tree.
- */
+/** Recursively removes named keys from objects (arrays and nesting preserved). */
 @Slf4j
 public class ExcludeDecorator extends JsonDecorator {
+
     private final List<String> keysToExclude;
     /**
      * Modifies a JSON tree by removing specified keys and their children.
@@ -50,8 +48,6 @@ public class ExcludeDecorator extends JsonDecorator {
      */
     private JsonNode removeKeysRecursively(JsonNode node, List<String> keys) {
         if (node.isObject()) {
-            // keys are iterated to remove from JSON and its elements proccessed recursively
-
             ObjectNode objectNode = node.deepCopy();
             for (String key : keys) {
                 objectNode.remove(key);
@@ -63,7 +59,6 @@ public class ExcludeDecorator extends JsonDecorator {
 
         } else if (node.isArray()) {
             // elements of JSON arrays are iterated and processed recursively
-
             ArrayNode arrayNode = node.deepCopy();
             for (int i = 0; i < arrayNode.size(); i++) {
                 arrayNode.set(i, removeKeysRecursively(arrayNode.get(i), keys));
