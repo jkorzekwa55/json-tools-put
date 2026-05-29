@@ -18,9 +18,7 @@ import pl.put.poznan.jsontools.service.JsonService;
 public class FilterDecorator extends JsonDecorator {
 
     private final Set<String> keysToKeep;
-    /**
-    * Modifies a JSON tree, by keeping only specified keys recusively.
-    */
+
     public FilterDecorator(JsonService wrappedService, List<String> keysToKeep) {
         super(wrappedService);
         this.keysToKeep = Set.copyOf(keysToKeep);
@@ -51,10 +49,8 @@ public class FilterDecorator extends JsonDecorator {
      */
     private JsonNode filterKeysRecursively(JsonNode node, Set<String> keys) {
         if (node.isObject()) {
-            // keys are iterated to remove from JSON and its elements proccessed recursively
-
             ObjectNode objectNode = node.deepCopy();
-            
+
             Iterator<String> fieldNames = node.fieldNames();
             while (fieldNames.hasNext()) {
                 String fieldName = fieldNames.next();
@@ -69,16 +65,13 @@ public class FilterDecorator extends JsonDecorator {
             return objectNode;
 
         } else if (node.isArray()) {
-            // elements of JSON arrays are iterated and processed recursively
-
             ArrayNode arrayNode = node.deepCopy();
             for (int i = 0; i < arrayNode.size(); i++) {
                 JsonNode arrayElement = arrayNode.get(i);
                 arrayNode.set(i, filterKeysRecursively(arrayElement, keys));
-            }   
+            }
             return arrayNode;
         }
         return node;
-
     }
 }

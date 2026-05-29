@@ -18,14 +18,13 @@ import pl.put.poznan.jsontools.service.JsonTransformApplicationService;
 
 import java.util.Collection;
 
-/**
- * {@link pl.put.poznan.jsontools.exception.JsonTransformExceptionHandler} maps domain errors to 400 responses with {@link pl.put.poznan.jsontools.exception.ErrorResponse}.
- */
+/** REST API for JSON transformations (minify, filter, exclude, pretty-print, combined pipeline). */
 @Slf4j
 @RestController
 @RequestMapping(path = "/api/json", produces = MediaType.APPLICATION_JSON_VALUE)
 @RequiredArgsConstructor
 public class JsonTransformController {
+
     private final JsonTransformApplicationService transformApplicationService;
 
     /**
@@ -78,9 +77,11 @@ public class JsonTransformController {
         log.debug("Pretty-print request JSON length: {}", lengthOf(request.getJson()));
         return transformApplicationService.prettyPrint(request.getJson());
     }
+
     private static int lengthOf(String text) {
         return text != null ? text.length() : 0;
     }
+
     private static int sizeOf(Collection<?> collection) {
         return collection != null ? collection.size() : 0;
     }

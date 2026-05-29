@@ -8,12 +8,7 @@ import lombok.NoArgsConstructor;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotEmpty;
 
-/**
- * Unified transform body: {@code { "json": "...", "actions": ["minify", "exclude-keys", "filter", "pretty-print"], "keysToExclude": ["x"], "keysToKeep": ["a"] }}
- * <p>
- * {@code keysToExclude} is used when an {@code exclude-keys} action appears.
- * {@code keysToKeep} is used when a {@code filter} action appears.
- */
+/** Request for {@code POST /api/json/transform}: JSON text, ordered actions, optional key lists. */
 @Data
 @NoArgsConstructor
 public class TransformRequest {

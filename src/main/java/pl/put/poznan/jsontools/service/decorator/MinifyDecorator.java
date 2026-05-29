@@ -6,17 +6,12 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import pl.put.poznan.jsontools.service.JsonService;
 
-/**
- * Decorator that minifies JSON to compact format.
- */
+/** Removes insignificant whitespace by compact serialization (shape unchanged). */
 @Slf4j
 public class MinifyDecorator extends JsonDecorator {
 
     private final ObjectMapper objectMapper = new ObjectMapper();
 
-    /**
-     * Modifies JSON tree, by minifying it to compacted format.
-     */
     public MinifyDecorator(JsonService wrappedService) {
         super(wrappedService);
     }

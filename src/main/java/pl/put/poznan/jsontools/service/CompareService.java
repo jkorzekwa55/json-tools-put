@@ -9,13 +9,11 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
+/** Line-by-line text comparison; differences use 1-based line numbers. */
 @Slf4j
 @Service
 public class CompareService {
-    /**
-     * Compares two texts line-by-line and returns a list of differing lines.
-     * Lines are 1-based.
-     */
+
     public List<DiffLine> compareLines(String left, String right) {
         log.info("Starting JSON comparison");
         log.debug("Comparison input lengths - left={}, right={}", lengthOf(left), lengthOf(right));

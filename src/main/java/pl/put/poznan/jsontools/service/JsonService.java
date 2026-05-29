@@ -1,17 +1,12 @@
 package pl.put.poznan.jsontools.service;
 
-
 import com.fasterxml.jackson.databind.JsonNode;
 
 /**
- * The Component interface in the Decorator pattern.
- * Defines the method for JSON transformation.
+ * Component in the Decorator pattern: transforms a {@link JsonNode}.
  */
 public interface JsonService {
-    /**
-     * Processes the input JSON node and returns a transformed version.
-     * @param input The raw or partially processed JsonNode.
-     * @return The transformed JsonNode.
-     */
+
+    /** Applies this step and returns the transformed node. */
     JsonNode process(JsonNode input);
 }

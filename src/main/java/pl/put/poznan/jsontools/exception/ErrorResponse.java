@@ -3,9 +3,7 @@ package pl.put.poznan.jsontools.exception;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
-/**
- * JSON error payload for transformation API failures.
- */
+/** Standard API error body: {@code {"error":"..."}}. */
 @Data
 @AllArgsConstructor
 public class ErrorResponse {

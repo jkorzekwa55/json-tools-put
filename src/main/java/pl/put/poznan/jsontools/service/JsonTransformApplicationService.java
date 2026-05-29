@@ -11,7 +11,6 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Service;
 import pl.put.poznan.jsontools.dto.TransformRequest;
 import pl.put.poznan.jsontools.exception.InvalidJsonException;
 import pl.put.poznan.jsontools.service.decorator.ExcludeDecorator;
@@ -19,15 +18,8 @@ import pl.put.poznan.jsontools.service.decorator.FilterDecorator;
 import pl.put.poznan.jsontools.service.decorator.MinifyDecorator;
 import pl.put.poznan.jsontools.service.decorator.PrettyPrintDecorator;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.Locale;
-
-
-
 /**
- * Builds decorator pipelines and runs transformations (parsing + {@link JsonService} chain).
- * Keeps HTTP adapters thin and matches the sprint task of a service layer that invokes transformations.
+ * Parses JSON text and runs {@link JsonService} decorator pipelines built from request actions.
  */
 @Service
 @Slf4j

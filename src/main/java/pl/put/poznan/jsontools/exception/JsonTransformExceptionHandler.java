@@ -10,9 +10,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.context.request.WebRequest;
 import java.util.stream.Collectors;
 
-/**
- * Maps request validation and parsing errors to HTTP 400 for all controllers.
- */
+/** Maps validation and parsing failures to HTTP 400 with {@link ErrorResponse}. */
 @Slf4j
 @RestControllerAdvice
 public class JsonTransformExceptionHandler {
