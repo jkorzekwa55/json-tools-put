@@ -1,0 +1,517 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width,initial-scale=1"/>
+    <title>JSON Tools</title>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+    <style>
+        *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+        :root{
+          --bg:#f5f3ff;
+          --surface:#ffffff;
+          --border:#e4e0f7;
+          --purple:#7c6fe0;
+          --purple-light:#ede9fc;
+          --purple-dark:#5b50b8;
+          --pink:#e879a0;
+          --teal:#2ec4b6;
+          --amber:#f59e0b;
+          --text:#2d2640;
+          --muted:#9590b0;
+          --mono:'JetBrains Mono',monospace;
+          --sans:'Nunito',sans-serif;
+          --radius:14px;
+          --radius-sm:9px;
+        }
+        *{box-sizing:border-box;margin:0;padding:0}
+        body{background:var(--bg);color:var(--text);font-family:var(--sans);min-height:100vh;display:flex;flex-direction:column}
+        body::before{content:'';position:fixed;inset:0;background-image:radial-gradient(var(--border) 1.5px,transparent 1.5px);background-size:28px 28px;pointer-events:none;z-index:0}
+
+        header{position:relative;z-index:1;padding:1.2rem 2rem;display:flex;align-items:center;gap:12px;background:var(--surface);border-bottom:1.5px solid var(--border)}
+        .logo{font-size:1.3rem;font-weight:800;color:var(--purple);display:flex;align-items:center;gap:8px}
+        .logo-box{width:30px;height:30px;background:var(--purple);border-radius:9px;display:flex;align-items:center;justify-content:center;color:#fff;font-size:0.8rem;font-weight:800}
+        .tagline{font-size:0.72rem;color:var(--muted);font-weight:700;background:var(--purple-light);padding:3px 10px;border-radius:99px;border:1.5px solid var(--border)}
+
+        main{position:relative;z-index:1;flex:1;display:flex;gap:1.5rem;max-width:1120px;margin:0 auto;width:100%;padding:2rem 1.5rem;align-items:flex-start}
+
+        /* ── Sidebar ── */
+        nav{flex-shrink:0;width:196px;display:flex;flex-direction:column;gap:5px;position:sticky;top:2rem}
+        .nav-group{font-size:0.62rem;text-transform:uppercase;letter-spacing:2px;color:var(--muted);font-weight:700;padding:0 8px;margin:8px 0 2px}
+        .nav-group:first-child{margin-top:0}
+        .nav-btn{display:flex;align-items:center;gap:9px;padding:8px 10px;border-radius:var(--radius-sm);border:1.5px solid transparent;background:none;font-family:var(--sans);font-size:0.83rem;font-weight:700;color:var(--muted);cursor:pointer;transition:all .15s;text-align:left;width:100%}
+        .nav-btn:hover{background:var(--surface);border-color:var(--border);color:var(--text)}
+        .nav-btn.active{background:var(--surface);border-color:var(--purple);color:var(--purple);box-shadow:0 2px 10px rgba(124,111,224,.13)}
+        .nav-icon{width:26px;height:26px;border-radius:7px;background:var(--purple-light);display:flex;align-items:center;justify-content:center;font-size:0.85rem;flex-shrink:0;transition:background .15s}
+        .nav-btn.active .nav-icon{background:var(--purple);color:#fff}
+        .nav-btn[data-panel="pipeline"] .nav-icon{background:#fef3c7}
+        .nav-btn[data-panel="pipeline"].active .nav-icon{background:var(--amber);color:#fff}
+        .nav-btn[data-panel="pipeline"].active{border-color:var(--amber);color:#92400e}
+
+        /* ── Content ── */
+        .content{flex:1;min-width:0;display:flex;flex-direction:column;gap:1.25rem}
+        .panel{display:none}.panel.active{display:flex;flex-direction:column;gap:1rem}
+
+        .card{background:var(--surface);border:1.5px solid var(--border);border-radius:var(--radius);padding:1.4rem;box-shadow:0 4px 20px rgba(124,111,224,.06)}
+
+        .panel-head{display:flex;align-items:center;gap:10px}
+        .panel-icon{width:36px;height:36px;border-radius:10px;background:var(--purple-light);display:flex;align-items:center;justify-content:center;font-size:1.05rem;flex-shrink:0}
+        .panel-icon.amber{background:#fef3c7}
+        .panel-title{font-size:1rem;font-weight:800;color:var(--text)}
+        .panel-desc{font-size:0.73rem;color:var(--muted);font-weight:600;margin-top:1px}
+
+        .field{display:flex;flex-direction:column;gap:5px}
+        .lbl{font-size:0.68rem;text-transform:uppercase;letter-spacing:1.5px;color:var(--muted);font-weight:700;display:flex;align-items:center;gap:5px}
+        .req{background:var(--pink);color:#fff;font-size:0.55rem;padding:1px 6px;border-radius:99px;font-weight:700}
+        .opt{background:#e0f2fe;color:#0369a1;font-size:0.55rem;padding:1px 6px;border-radius:99px;font-weight:700}
+        .hint{font-size:0.71rem;color:var(--muted);font-weight:600}
+
+        textarea,input[type=text]{font-family:var(--mono);font-size:0.77rem;background:#faf9ff;border:1.5px solid var(--border);border-radius:var(--radius-sm);color:var(--text);padding:9px 11px;width:100%;outline:none;transition:border-color .15s,box-shadow .15s;resize:vertical;line-height:1.5}
+        textarea{min-height:150px}
+        textarea:focus,input[type=text]:focus{border-color:var(--purple);box-shadow:0 0 0 3px rgba(124,111,224,.11)}
+        textarea.err,input.err{border-color:var(--pink);box-shadow:0 0 0 3px rgba(232,121,160,.1)}
+
+        .two-col{display:grid;grid-template-columns:1fr 1fr;gap:1rem}
+
+        /* ── Pipeline actions ── */
+        .actions-row{display:flex;flex-wrap:wrap;gap:8px}
+        .action-chip{display:flex;align-items:center;gap:5px;padding:5px 12px;border-radius:99px;border:1.5px solid var(--border);background:var(--purple-light);font-family:var(--sans);font-size:0.78rem;font-weight:700;color:var(--purple-dark);cursor:pointer;transition:all .15s;user-select:none}
+        .action-chip:hover{border-color:var(--purple)}
+        .action-chip.selected{background:var(--purple);color:#fff;border-color:var(--purple)}
+        .action-chip.selected.amber{background:var(--amber);border-color:var(--amber);color:#fff}
+        .chip-check{font-size:0.7rem;opacity:0}.action-chip.selected .chip-check{opacity:1}
+        .pipeline-note{font-size:0.72rem;color:var(--muted);font-weight:600;padding:8px 12px;background:var(--purple-light);border-radius:var(--radius-sm);border:1.5px solid var(--border)}
+
+        /* ── Buttons ── */
+        .run-btn{display:flex;align-items:center;gap:7px;padding:9px 22px;background:var(--purple);color:#fff;font-family:var(--sans);font-weight:800;font-size:0.83rem;border:none;border-radius:99px;cursor:pointer;transition:transform .1s,box-shadow .15s,background .15s;box-shadow:0 4px 14px rgba(124,111,224,.32);align-self:flex-start}
+        .run-btn:hover{background:var(--purple-dark);box-shadow:0 6px 18px rgba(124,111,224,.38)}
+        .run-btn:active{transform:scale(0.97)}
+        .run-btn:disabled{opacity:.45;cursor:not-allowed;box-shadow:none}
+        .run-btn.amber-btn{background:var(--amber);box-shadow:0 4px 14px rgba(245,158,11,.3)}
+        .run-btn.amber-btn:hover{background:#d97706;box-shadow:0 6px 18px rgba(245,158,11,.38)}
+        .spin{width:13px;height:13px;border:2.5px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:spin .6s linear infinite;display:none}
+        @keyframes spin{to{transform:rotate(360deg)}}
+
+        /* ── Result ── */
+        .result-card{background:var(--surface);border:1.5px solid var(--border);border-radius:var(--radius);overflow:hidden;display:none;box-shadow:0 4px 20px rgba(124,111,224,.06)}
+        .result-card.show{display:block}
+        .result-top{display:flex;align-items:center;justify-content:space-between;padding:9px 14px;background:var(--purple-light);border-bottom:1.5px solid var(--border)}
+        .result-badge{display:flex;align-items:center;gap:6px;font-size:0.73rem;font-weight:800;color:var(--purple-dark)}
+        .result-badge::before{content:'';width:7px;height:7px;border-radius:50%;background:var(--purple);flex-shrink:0}
+        .result-badge.err{color:var(--pink)}.result-badge.err::before{background:var(--pink)}
+        .copy-btn{font-family:var(--sans);font-size:0.7rem;font-weight:700;color:var(--purple);background:var(--surface);border:1.5px solid var(--border);padding:3px 12px;border-radius:99px;cursor:pointer;transition:all .15s}
+        .copy-btn:hover{background:var(--purple);color:#fff;border-color:var(--purple)}
+
+        pre.result-body{font-family:var(--mono);font-size:0.77rem;padding:1rem 1.1rem;white-space:pre-wrap;word-break:break-all;max-height:380px;overflow-y:auto;color:var(--text);line-height:1.6}
+        pre.result-body.err{color:var(--pink)}
+
+        /* ── Diff table ── */
+        .diff-wrap{overflow-x:auto;max-height:420px;overflow-y:auto}
+        table.diff{width:100%;border-collapse:collapse;font-family:var(--mono);font-size:0.75rem}
+        table.diff th{padding:6px 10px;text-align:left;font-family:var(--sans);font-size:0.65rem;text-transform:uppercase;letter-spacing:1.5px;color:var(--muted);font-weight:700;border-bottom:1.5px solid var(--border);background:var(--purple-light);position:sticky;top:0}
+        table.diff td{padding:5px 10px;border-bottom:1px solid var(--border);vertical-align:top;line-height:1.5}
+        table.diff td.ln{color:var(--muted);width:36px;text-align:right;user-select:none;font-size:0.7rem}
+        table.diff tr.added td{background:#f0fdf9}
+        table.diff tr.removed td{background:#fff0f5}
+        table.diff tr.changed td{background:#fefce8}
+        .tag-add{color:var(--teal);font-weight:700}
+        .tag-rem{color:var(--pink);font-weight:700}
+        .tag-chg{color:var(--amber);font-weight:700}
+        .no-diff{padding:1rem 1.1rem;font-family:var(--sans);font-size:0.82rem;color:var(--teal);font-weight:700;display:flex;align-items:center;gap:6px}
+
+        @media(max-width:720px){
+          main{flex-direction:column;padding:1rem}
+          nav{width:100%;flex-direction:row;flex-wrap:wrap;position:static}
+          .nav-group{display:none}
+          .two-col{grid-template-columns:1fr}
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <div class="logo">
+        <div class="logo-box">{}</div>
+        jsontools
+    </div>
+    <span class="tagline">Spring Boot · REST API</span>
+</header>
+
+<main>
+    <nav>
+        <div class="nav-group">Transform</div>
+        <button class="nav-btn active" data-panel="minify">
+            <span class="nav-icon">⟨⟩</span>Minify
+        </button>
+        <button class="nav-btn" data-panel="pretty">
+            <span class="nav-icon">✦</span>Pretty print
+        </button>
+        <button class="nav-btn" data-panel="filter">
+            <span class="nav-icon">⊃</span>Filter keys
+        </button>
+        <button class="nav-btn" data-panel="exclude">
+            <span class="nav-icon">⊄</span>Exclude keys
+        </button>
+        <button class="nav-btn" data-panel="pipeline">
+            <span class="nav-icon">⛓</span>Pipeline
+        </button>
+        <div class="nav-group">Analyse</div>
+        <button class="nav-btn" data-panel="compare">
+            <span class="nav-icon">⇄</span>Compare
+        </button>
+    </nav>
+
+    <div class="content">
+
+        <!-- ── Minify ── -->
+        <div class="panel active" id="panel-minify">
+            <div class="card">
+                <div class="panel-head" style="margin-bottom:1rem">
+                    <div class="panel-icon">⟨⟩</div>
+                    <div><div class="panel-title">Minify JSON</div><div class="panel-desc">Strips all whitespace — smallest possible output</div></div>
+                </div>
+                <div class="field">
+                    <div class="lbl">JSON input <span class="req">required</span></div>
+                    <textarea id="minify-json" placeholder='{ "hello": "world", "nums": [1, 2, 3] }'></textarea>
+                </div>
+                <button class="run-btn" style="margin-top:.75rem" onclick="doMinify()">
+                    <span class="spin" id="sp-minify"></span>✦ Run minify
+                </button>
+            </div>
+        </div>
+
+        <!-- ── Pretty print ── -->
+        <div class="panel" id="panel-pretty">
+            <div class="card">
+                <div class="panel-head" style="margin-bottom:1rem">
+                    <div class="panel-icon">✦</div>
+                    <div><div class="panel-title">Pretty print</div><div class="panel-desc">Adds indentation for human-readable output</div></div>
+                </div>
+                <div class="field">
+                    <div class="lbl">JSON input <span class="req">required</span></div>
+                    <textarea id="pretty-json" placeholder='{"hello":"world","nums":[1,2,3]}'></textarea>
+                </div>
+                <button class="run-btn" style="margin-top:.75rem" onclick="doPretty()">
+                    <span class="spin" id="sp-pretty"></span>✦ Run pretty print
+                </button>
+            </div>
+        </div>
+
+        <!-- ── Filter keys ── -->
+        <div class="panel" id="panel-filter">
+            <div class="card">
+                <div class="panel-head" style="margin-bottom:1rem">
+                    <div class="panel-icon">⊃</div>
+                    <div><div class="panel-title">Filter keys</div><div class="panel-desc">Keep only the keys you specify</div></div>
+                </div>
+                <div class="field">
+                    <div class="lbl">JSON input <span class="req">required</span></div>
+                    <textarea id="filter-json" placeholder='{ "name": "Alice", "age": 30, "city": "Poznań", "password": "secret" }'></textarea>
+                </div>
+                <div class="field">
+                    <div class="lbl">Keys to keep <span class="req">required</span></div>
+                    <input type="text" id="filter-keys" placeholder="name, age"/>
+                    <div class="hint">Comma-separated — only these keys appear in the output</div>
+                </div>
+                <button class="run-btn" style="margin-top:.75rem" onclick="doFilter()">
+                    <span class="spin" id="sp-filter"></span>✦ Run filter
+                </button>
+            </div>
+        </div>
+
+        <!-- ── Exclude keys ── -->
+        <div class="panel" id="panel-exclude">
+            <div class="card">
+                <div class="panel-head" style="margin-bottom:1rem">
+                    <div class="panel-icon">⊄</div>
+                    <div><div class="panel-title">Exclude keys</div><div class="panel-desc">Strip specific keys from your JSON</div></div>
+                </div>
+                <div class="field">
+                    <div class="lbl">JSON input <span class="req">required</span></div>
+                    <textarea id="exclude-json" placeholder='{ "name": "Alice", "password": "secret", "age": 30 }'></textarea>
+                </div>
+                <div class="field">
+                    <div class="lbl">Keys to remove <span class="req">required</span></div>
+                    <input type="text" id="exclude-keys" placeholder="password"/>
+                    <div class="hint">Comma-separated — these keys are stripped from the output</div>
+                </div>
+                <button class="run-btn" style="margin-top:.75rem" onclick="doExclude()">
+                    <span class="spin" id="sp-exclude"></span>✦ Run exclude
+                </button>
+            </div>
+        </div>
+
+        <!-- ── Pipeline ── -->
+        <div class="panel" id="panel-pipeline">
+            <div class="card">
+                <div class="panel-head" style="margin-bottom:1rem">
+                    <div class="panel-icon amber">⛓</div>
+                    <div><div class="panel-title">Pipeline</div><div class="panel-desc">Chain multiple actions in one request via <code style="font-family:var(--mono);font-size:0.78rem">/api/json/transform</code></div></div>
+                </div>
+                <div class="field">
+                    <div class="lbl">JSON input <span class="req">required</span></div>
+                    <textarea id="pipe-json" placeholder='{ "name": "Alice", "password": "secret", "age": 30 }'></textarea>
+                </div>
+                <div class="field">
+                    <div class="lbl">Actions to run <span class="req">pick at least one</span></div>
+                    <div class="actions-row">
+                        <button class="action-chip" data-action="minify" onclick="toggleAction(this)">
+                            <span class="chip-check">✓</span> minify
+                        </button>
+                        <button class="action-chip" data-action="pretty-print" onclick="toggleAction(this)">
+                            <span class="chip-check">✓</span> pretty-print
+                        </button>
+                        <button class="action-chip" data-action="filter" onclick="toggleAction(this)">
+                            <span class="chip-check">✓</span> filter
+                        </button>
+                        <button class="action-chip" data-action="exclude-keys" onclick="toggleAction(this)">
+                            <span class="chip-check">✓</span> exclude-keys
+                        </button>
+                    </div>
+                    <div class="hint">Actions run in the order shown above</div>
+                </div>
+                <div class="field" id="pipe-keep-field" style="display:none">
+                    <div class="lbl">Keys to keep <span class="req">required for filter</span></div>
+                    <input type="text" id="pipe-keep" placeholder="name, age"/>
+                    <div class="hint">Comma-separated</div>
+                </div>
+                <div class="field" id="pipe-excl-field" style="display:none">
+                    <div class="lbl">Keys to exclude <span class="req">required for exclude-keys</span></div>
+                    <input type="text" id="pipe-excl" placeholder="password"/>
+                    <div class="hint">Comma-separated</div>
+                </div>
+                <div class="pipeline-note">
+                    💡 Actions are chained — the output of each step feeds into the next.
+                </div>
+                <button class="run-btn amber-btn" style="margin-top:.75rem" onclick="doPipeline()">
+                    <span class="spin" id="sp-pipeline"></span>⛓ Run pipeline
+                </button>
+            </div>
+        </div>
+
+        <!-- ── Compare ── -->
+        <div class="panel" id="panel-compare">
+            <div class="card">
+                <div class="panel-head" style="margin-bottom:1rem">
+                    <div class="panel-icon">⇄</div>
+                    <div><div class="panel-title">Compare JSON</div><div class="panel-desc">Diff two JSON documents line by line</div></div>
+                </div>
+                <div class="two-col">
+                    <div class="field">
+                        <div class="lbl">Left <span class="req">required</span></div>
+                        <textarea id="compare-left" placeholder='{ "x": 1, "y": 2 }'></textarea>
+                    </div>
+                    <div class="field">
+                        <div class="lbl">Right <span class="req">required</span></div>
+                        <textarea id="compare-right" placeholder='{ "x": 1, "y": 99 }'></textarea>
+                    </div>
+                </div>
+                <button class="run-btn" style="margin-top:.75rem" onclick="doCompare()">
+                    <span class="spin" id="sp-compare"></span>✦ Run compare
+                </button>
+            </div>
+        </div>
+
+        <!-- ── Result ── -->
+        <div class="result-card" id="result-card">
+            <div class="result-top">
+                <span class="result-badge" id="result-badge">Result</span>
+                <button class="copy-btn" onclick="copyResult()">Copy</button>
+            </div>
+            <div id="result-inner"></div>
+        </div>
+
+    </div>
+</main>
+
+<script>
+    // ── Nav ──────────────────────────────────────────────────────────
+    document.querySelectorAll('.nav-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+        document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+        btn.classList.add('active');
+        document.getElementById('panel-' + btn.dataset.panel).classList.add('active');
+        hideResult();
+      });
+    });
+
+    // ── Pipeline chip toggle ─────────────────────────────────────────
+    function toggleAction(chip) {
+      chip.classList.toggle('selected');
+      const sel = [...document.querySelectorAll('.action-chip.selected')].map(c => c.dataset.action);
+      document.getElementById('pipe-keep-field').style.display = sel.includes('filter') ? '' : 'none';
+      document.getElementById('pipe-excl-field').style.display = sel.includes('exclude-keys') ? '' : 'none';
+    }
+
+    // ── Helpers ──────────────────────────────────────────────────────
+    function valid(el) {
+      try { JSON.parse(el.value); el.classList.remove('err'); return true; }
+      catch { el.classList.add('err'); return false; }
+    }
+    function keys(str) { return str.split(',').map(s => s.trim()).filter(Boolean); }
+    function spin(id, on) { const s = document.getElementById('sp-'+id); if(s) s.style.display = on ? 'inline-block' : 'none'; }
+
+    function showText(text, isErr) {
+      const inner = document.getElementById('result-inner');
+      inner.innerHTML = '';
+      const pre = document.createElement('pre');
+      pre.className = 'result-body' + (isErr ? ' err' : '');
+      pre.textContent = text;
+      inner.appendChild(pre);
+      showCard(isErr);
+    }
+
+    function showDiff(diffs) {
+      const inner = document.getElementById('result-inner');
+      inner.innerHTML = '';
+      if (!diffs || diffs.length === 0) {
+        inner.innerHTML = '<div class="no-diff">✓ No differences found — the two JSONs are identical.</div>';
+        showCard(false);
+        return;
+      }
+      const wrap = document.createElement('div');
+      wrap.className = 'diff-wrap';
+      const table = document.createElement('table');
+      table.className = 'diff';
+      table.innerHTML = `<thead><tr>
+        <th style="width:36px">#</th>
+        <th style="width:80px">Status</th>
+        <th>Left</th>
+        <th>Right</th>
+      </tr></thead>`;
+      const tbody = document.createElement('tbody');
+      diffs.forEach(d => {
+        const hasLeft  = d.left  !== null && d.left  !== undefined && d.left  !== '';
+        const hasRight = d.right !== null && d.right !== undefined && d.right !== '';
+        let cls, tag;
+        if (hasLeft && !hasRight)       { cls = 'removed'; tag = '<span class="tag-rem">− removed</span>'; }
+        else if (!hasLeft && hasRight)  { cls = 'added';   tag = '<span class="tag-add">+ added</span>';   }
+        else                            { cls = 'changed'; tag = '<span class="tag-chg">~ changed</span>'; }
+        const tr = document.createElement('tr');
+        tr.className = cls;
+        tr.innerHTML = `<td class="ln">${d.line}</td><td>${tag}</td><td>${esc(d.left)}</td><td>${esc(d.right)}</td>`;
+        tbody.appendChild(tr);
+      });
+      table.appendChild(tbody);
+      wrap.appendChild(table);
+      inner.appendChild(wrap);
+      showCard(false);
+    }
+
+    function showCard(isErr) {
+      const card  = document.getElementById('result-card');
+      const badge = document.getElementById('result-badge');
+      card.classList.add('show');
+      badge.textContent = isErr ? 'Error' : 'Result';
+      badge.className = 'result-badge' + (isErr ? ' err' : '');
+      card.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
+
+    function hideResult() { document.getElementById('result-card').classList.remove('show'); }
+
+    function esc(str) {
+      if (str === null || str === undefined) return '<span style="color:var(--muted)">—</span>';
+      return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+    }
+
+    function copyResult() {
+      const text = document.getElementById('result-inner').innerText;
+      navigator.clipboard.writeText(text).catch(()=>{});
+      const b = document.querySelector('.copy-btn');
+      b.textContent = 'Copied ✓';
+      setTimeout(() => b.textContent = 'Copy', 1600);
+    }
+
+    async function post(url, body) {
+      const r = await fetch(url, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body)
+      });
+      if (!r.ok) throw new Error('HTTP ' + r.status + ': ' + await r.text().catch(() => r.statusText));
+      const ct = r.headers.get('content-type') || '';
+      return ct.includes('application/json') ? r.json() : r.text();
+    }
+
+    // ── Endpoints ────────────────────────────────────────────────────
+    async function doMinify() {
+      const el = document.getElementById('minify-json');
+      if (!valid(el)) { showText('Invalid JSON — fix the red textarea first.', true); return; }
+      spin('minify', true);
+      try { const d = await post('/api/json/minify', { json: el.value }); showText(typeof d==='string'?d:JSON.stringify(d), false); }
+      catch(e) { showText(e.message, true); }
+      finally { spin('minify', false); }
+    }
+
+    async function doPretty() {
+      const el = document.getElementById('pretty-json');
+      if (!valid(el)) { showText('Invalid JSON — fix the red textarea first.', true); return; }
+      spin('pretty', true);
+      try { const d = await post('/api/json/pretty-print', { json: el.value }); showText(typeof d==='string'?d:JSON.stringify(d,null,2), false); }
+      catch(e) { showText(e.message, true); }
+      finally { spin('pretty', false); }
+    }
+
+    async function doFilter() {
+      const el = document.getElementById('filter-json');
+      const k  = keys(document.getElementById('filter-keys').value);
+      if (!valid(el)) { showText('Invalid JSON — fix the red textarea first.', true); return; }
+      if (!k.length)  { showText('Enter at least one key to keep.', true); return; }
+      spin('filter', true);
+      try { const d = await post('/api/json/filter-keys', { json: el.value, keysToKeep: k }); showText(JSON.stringify(d,null,2), false); }
+      catch(e) { showText(e.message, true); }
+      finally { spin('filter', false); }
+    }
+
+    async function doExclude() {
+      const el = document.getElementById('exclude-json');
+      const k  = keys(document.getElementById('exclude-keys').value);
+      if (!valid(el)) { showText('Invalid JSON — fix the red textarea first.', true); return; }
+      if (!k.length)  { showText('Enter at least one key to exclude.', true); return; }
+      spin('exclude', true);
+      try { const d = await post('/api/json/exclude-keys', { json: el.value, keysToExclude: k }); showText(JSON.stringify(d,null,2), false); }
+      catch(e) { showText(e.message, true); }
+      finally { spin('exclude', false); }
+    }
+
+    async function doPipeline() {
+      const el      = document.getElementById('pipe-json');
+      const actions = [...document.querySelectorAll('.action-chip.selected')].map(c => c.dataset.action);
+      if (!valid(el))       { showText('Invalid JSON — fix the red textarea first.', true); return; }
+      if (!actions.length)  { showText('Pick at least one action.', true); return; }
+
+      const body = { json: el.value, actions };
+      if (actions.includes('filter')) {
+        const k = keys(document.getElementById('pipe-keep').value);
+        if (!k.length) { showText('Filter action selected — enter at least one key to keep.', true); return; }
+        body.keysToKeep = k;
+      }
+      if (actions.includes('exclude-keys')) {
+        const k = keys(document.getElementById('pipe-excl').value);
+        if (!k.length) { showText('Exclude-keys action selected — enter at least one key to exclude.', true); return; }
+        body.keysToExclude = k;
+      }
+      spin('pipeline', true);
+      try { const d = await post('/api/json/transform', body); showText(typeof d==='string'?d:JSON.stringify(d,null,2), false); }
+      catch(e) { showText(e.message, true); }
+      finally { spin('pipeline', false); }
+    }
+
+    async function doCompare() {
+      const la = document.getElementById('compare-left');
+      const ra = document.getElementById('compare-right');
+      // compare accepts plain text too, so we only validate if it looks like it should be JSON
+      const ok = valid(la) & valid(ra);
+      if (!ok) { showText('Both inputs must be valid JSON.', true); return; }
+      spin('compare', true);
+      try {
+        const d = await post('/api/json/compare', { left: la.value, right: ra.value });
+        showDiff(d.differences);
+      }
+      catch(e) { showText(e.message, true); }
+      finally { spin('compare', false); }
+    }
+</script>
+</body>
+</html>
