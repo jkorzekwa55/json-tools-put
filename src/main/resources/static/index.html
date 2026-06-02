@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width,initial-scale=1"/>
+    <title>JSON Tools</title>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+    <link rel="stylesheet" href="style.css"/>
+</head>
+<body>
+
+<header>
+    <div class="logo">
+        <div class="logo-box">{}</div>
+        jsontools
+    </div>
+    <span class="tagline">Spring Boot · REST API</span>
+</header>
+
+<main>
+    <nav>
+        <div class="nav-group">Transform</div>
+        <button class="nav-btn active" data-panel="minify">
+            <span class="nav-icon">⟨⟩</span>Minify
+        </button>
+        <button class="nav-btn" data-panel="pretty">
+            <span class="nav-icon">✦</span>Pretty print
+        </button>
+        <button class="nav-btn" data-panel="filter">
+            <span class="nav-icon">⊃</span>Filter keys
+        </button>
+        <button class="nav-btn" data-panel="exclude">
+            <span class="nav-icon">⊄</span>Exclude keys
+        </button>
+        <button class="nav-btn" data-panel="pipeline">
+            <span class="nav-icon">⛓</span>Pipeline
+        </button>
+        <div class="nav-group">Analyse</div>
+        <button class="nav-btn" data-panel="compare">
+            <span class="nav-icon">⇄</span>Compare
+        </button>
+    </nav>
+
+    <div class="content">
+
+        <!-- ── Minify ── -->
+        <div class="panel active" id="panel-minify">
+            <div class="card">
+                <div class="panel-head" style="margin-bottom:1rem">
+                    <div class="panel-icon">⟨⟩</div>
+                    <div>
+                        <div class="panel-title">Minify JSON</div>
+                        <div class="panel-desc">Strips all whitespace — smallest possible output</div>
+                    </div>
+                </div>
+                <div class="field">
+                    <div class="lbl">JSON input <span class="req">required</span></div>
+                    <textarea id="minify-json" placeholder='{ "hello": "world", "nums": [1, 2, 3] }'></textarea>
+                </div>
+                <button class="run-btn" style="margin-top:.75rem" onclick="doMinify()">
+                    <span class="spin" id="sp-minify"></span>✦ Run minify
+                </button>
+            </div>
+        </div>
+
+        <!-- ── Pretty print ── -->
+        <div class="panel" id="panel-pretty">
+            <div class="card">
+                <div class="panel-head" style="margin-bottom:1rem">
+                    <div class="panel-icon">✦</div>
+                    <div>
+                        <div class="panel-title">Pretty print</div>
+                        <div class="panel-desc">Adds indentation for human-readable output</div>
+                    </div>
+                </div>
+                <div class="field">
+                    <div class="lbl">JSON input <span class="req">required</span></div>
+                    <textarea id="pretty-json" placeholder='{"hello":"world","nums":[1,2,3]}'></textarea>
+                </div>
+                <button class="run-btn" style="margin-top:.75rem" onclick="doPretty()">
+                    <span class="spin" id="sp-pretty"></span>✦ Run pretty print
+                </button>
+            </div>
+        </div>
+
+        <!-- ── Filter keys ── -->
+        <div class="panel" id="panel-filter">
+            <div class="card">
+                <div class="panel-head" style="margin-bottom:1rem">
+                    <div class="panel-icon">⊃</div>
+                    <div>
+                        <div class="panel-title">Filter keys</div>
+                        <div class="panel-desc">Keep only the keys you specify</div>
+                    </div>
+                </div>
+                <div class="field">
+                    <div class="lbl">JSON input <span class="req">required</span></div>
+                    <textarea id="filter-json" placeholder='{ "name": "Alice", "age": 30, "city": "Poznań", "password": "secret" }'></textarea>
+                </div>
+                <div class="field">
+                    <div class="lbl">Keys to keep <span class="req">required</span></div>
+                    <input type="text" id="filter-keys" placeholder="name, age"/>
+                    <div class="hint">Comma-separated — only these keys appear in the output</div>
+                </div>
+                <button class="run-btn" style="margin-top:.75rem" onclick="doFilter()">
+                    <span class="spin" id="sp-filter"></span>✦ Run filter
+                </button>
+            </div>
+        </div>
+
+        <!-- ── Exclude keys ── -->
+        <div class="panel" id="panel-exclude">
+            <div class="card">
+                <div class="panel-head" style="margin-bottom:1rem">
+                    <div class="panel-icon">⊄</div>
+                    <div>
+                        <div class="panel-title">Exclude keys</div>
+                        <div class="panel-desc">Strip specific keys from your JSON</div>
+                    </div>
+                </div>
+                <div class="field">
+                    <div class="lbl">JSON input <span class="req">required</span></div>
+                    <textarea id="exclude-json" placeholder='{ "name": "Alice", "password": "secret", "age": 30 }'></textarea>
+                </div>
+                <div class="field">
+                    <div class="lbl">Keys to remove <span class="req">required</span></div>
+                    <input type="text" id="exclude-keys" placeholder="password"/>
+                    <div class="hint">Comma-separated — these keys are stripped from the output</div>
+                </div>
+                <button class="run-btn" style="margin-top:.75rem" onclick="doExclude()">
+                    <span class="spin" id="sp-exclude"></span>✦ Run exclude
+                </button>
+            </div>
+        </div>
+
+        <!-- ── Pipeline ── -->
+        <div class="panel" id="panel-pipeline">
+            <div class="card">
+                <div class="panel-head" style="margin-bottom:1rem">
+                    <div class="panel-icon amber">⛓</div>
+                    <div>
+                        <div class="panel-title">Pipeline</div>
+                        <div class="panel-desc">Chain multiple actions in one request via <code style="font-family:var(--mono);font-size:0.78rem">/api/json/transform</code></div>
+                    </div>
+                </div>
+                <div class="field">
+                    <div class="lbl">JSON input <span class="req">required</span></div>
+                    <textarea id="pipe-json" placeholder='{ "name": "Alice", "password": "secret", "age": 30 }'></textarea>
+                </div>
+                <div class="field">
+                    <div class="lbl">Actions to run <span class="req">pick at least one</span></div>
+                    <div class="actions-row">
+                        <button class="action-chip" data-action="minify" onclick="toggleAction(this)">
+                            <span class="chip-check">✓</span> minify
+                        </button>
+                        <button class="action-chip" data-action="pretty-print" onclick="toggleAction(this)">
+                            <span class="chip-check">✓</span> pretty-print
+                        </button>
+                        <button class="action-chip" data-action="filter" onclick="toggleAction(this)">
+                            <span class="chip-check">✓</span> filter
+                        </button>
+                        <button class="action-chip" data-action="exclude-keys" onclick="toggleAction(this)">
+                            <span class="chip-check">✓</span> exclude-keys
+                        </button>
+                    </div>
+                    <div class="hint">Actions run in the order shown above</div>
+                </div>
+                <div class="field" id="pipe-keep-field" style="display:none">
+                    <div class="lbl">Keys to keep <span class="req">required for filter</span></div>
+                    <input type="text" id="pipe-keep" placeholder="name, age"/>
+                    <div class="hint">Comma-separated</div>
+                </div>
+                <div class="field" id="pipe-excl-field" style="display:none">
+                    <div class="lbl">Keys to exclude <span class="req">required for exclude-keys</span></div>
+                    <input type="text" id="pipe-excl" placeholder="password"/>
+                    <div class="hint">Comma-separated</div>
+                </div>
+                <div class="pipeline-note">
+                    💡 Actions are chained — the output of each step feeds into the next.
+                </div>
+                <button class="run-btn amber-btn" style="margin-top:.75rem" onclick="doPipeline()">
+                    <span class="spin" id="sp-pipeline"></span>⛓ Run pipeline
+                </button>
+            </div>
+        </div>
+
+        <!-- ── Compare ── -->
+        <div class="panel" id="panel-compare">
+            <div class="card">
+                <div class="panel-head" style="margin-bottom:1rem">
+                    <div class="panel-icon">⇄</div>
+                    <div>
+                        <div class="panel-title">Compare JSON</div>
+                        <div class="panel-desc">Diff two JSON documents line by line</div>
+                    </div>
+                </div>
+                <div class="two-col">
+                    <div class="field">
+                        <div class="lbl">Left <span class="req">required</span></div>
+                        <textarea id="compare-left" placeholder='{ "x": 1, "y": 2 }'></textarea>
+                    </div>
+                    <div class="field">
+                        <div class="lbl">Right <span class="req">required</span></div>
+                        <textarea id="compare-right" placeholder='{ "x": 1, "y": 99 }'></textarea>
+                    </div>
+                </div>
+                <button class="run-btn" style="margin-top:.75rem" onclick="doCompare()">
+                    <span class="spin" id="sp-compare"></span>✦ Run compare
+                </button>
+            </div>
+        </div>
+
+        <!-- ── Result ── -->
+        <div class="result-card" id="result-card">
+            <div class="result-top">
+                <span class="result-badge" id="result-badge">Result</span>
+                <button class="copy-btn" onclick="copyResult()">Copy</button>
+            </div>
+            <div id="result-inner"></div>
+        </div>
+
+    </div>
+</main>
+
+<script src="app.js"></script>
+</body>
+</html>
