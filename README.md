@@ -37,7 +37,7 @@ Compare two JSON objects and identify structural differences.
 All features are available via REST endpoints for external integration.
 
 ### User Interface
-All features are accessible through in-browser user inteface. 
+All features are accessible through in-browser user interface. 
 
 ---
 
